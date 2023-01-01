@@ -6,6 +6,8 @@ from typing import Sequence
 
 from bits import extract_int16_le, extract_uint16_le, extract_uint16_be
 from spi_sensor import SPI_sensor
+from spidev import SpiDev
+
 
 class LSM9DS1_AG(SPI_sensor):
     WHO_AM_I     =0x0F
@@ -40,7 +42,7 @@ class LSM9DS1_AG(SPI_sensor):
             return val
         else:
             return vals.index(val)
-    def __init__(self,spi:spidev.SpiDev):
+    def __init__(self,spi:SpiDev):
         super().__init__(spi)
     def whoami(self)->int:
         return self.read_reg(self.WHO_AM_I)
@@ -113,8 +115,11 @@ class LSM9DS1_AG(SPI_sensor):
 
 
 def main():
-    import spidev
-    spi = spidev.SpiDev()
+    """
+    This code depends on ~CE0 of Pi being connected directly to ~CS of sensor. If not,
+    use read_sensors() instead, which drives the CS address decoder.
+    """
+    spi = SpiDev()
     spi.open(0, 0)
     # Allowed SPI from table at https://www.takaitra.com/spi-device-raspberry-pi/
     allowed_spi_spd = [125_000_000,
