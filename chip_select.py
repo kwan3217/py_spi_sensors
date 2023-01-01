@@ -34,7 +34,6 @@ class ChipSelect:
                      GPIO.HIGH if ((addr >> 1) & 0x01)==0x01 else GPIO.LOW,
                      GPIO.HIGH if ((addr >> 2) & 0x01)==0x01 else GPIO.LOW,
                      )
-        print(out)
         GPIO.output(self.pins,out)
 
 def main():
