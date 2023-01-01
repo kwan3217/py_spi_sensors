@@ -1,6 +1,6 @@
 import time
 
-import spidev
+from spidev import SpiDev
 
 from spi_sensor import SPI_sensor
 
@@ -15,7 +15,7 @@ class BME680(SPI_sensor):
     meas_status_0 = 0x1d;
     pres_msb = 0x1f;
 
-    def __init__(self,spi:spidev.SpiDev):
+    def __init__(self,spi:SpiDev):
         super().__init__(spi)
         self.page=0
     def set_page(self,new_page:int,force:bool=False):
@@ -226,3 +226,25 @@ class BME680(SPI_sensor):
             h=self.calibrate_h(rh,T)
             dh=self.calibrate_h(rh+1,T)-h
             return rP,P,dP,rT,T,dT,rh,h,dh
+
+def main():
+    """
+    This depends on ~CE0 being connected directly to ~CS on sensor
+    """
+    spi = SpiDev()
+    spi.open(0, 0)
+
+    spi.max_speed_hz = 3_900_000
+    spi.mode = 0b00
+
+    bme = BME680(spi)
+    bme.begin()
+    print(f'Chip ID (should be 0x61): 0x{bme.whoami():02x}')
+    while True:
+        print(bme.wait_ready())
+        rP, P, dP, rT, T, dT, rh, h, dh = bme.query()
+        print(
+            f'P: raw {rP:6d}, cal {P:.1f}  Pa, d {dP:.4e}Pa    T: raw {rT:6d}, cal {T:.4f}degC, d {dT:.4e}degC    h: raw {rh:6d}, cal {h:.3f}    %, d {dh:.4e}%')
+
+if __name__=="__main__":
+    main()
