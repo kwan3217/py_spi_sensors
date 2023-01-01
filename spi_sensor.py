@@ -45,7 +45,7 @@ class SPI_sensor:
         result=self.read_reg(reg_addr,2)
         return extract_uint16_le(result)
     def read_int16(self,reg_addr:int)->int:
-        return extract_int16_le(self.read_uint16(reg_addr))
+        return extract_int16_le(self.read_reg(reg_addr,2))
     def read_int8(self,reg_addr:int)->int:
         result=self.read_reg(reg_addr)
         if result>0x80:
